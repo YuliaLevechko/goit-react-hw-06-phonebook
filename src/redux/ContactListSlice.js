@@ -6,13 +6,21 @@ import { nanoid } from 'nanoid';
 const initialState = {
   items: [],
 };
+
 export const contactsSlice = createSlice({
   name: 'contacts',
   initialState,
   reducers: {
     addContact: {
       reducer(state, { payload }) {
-        state.items.push(payload);
+        // Check for uniqueness based on id
+        const isUnique = state.items.every(item => item.id !== payload.id);
+        
+        if (isUnique) {
+          state.items.push(payload);
+        } else {
+          console.error('Duplicate id found. Contact not added.');
+        }
       },
       prepare(contact) {
         return {
@@ -33,6 +41,7 @@ const persistConfig = {
   key: 'contacts',
   storage,
 };
+
 export const persistedReducer = persistReducer(
   persistConfig,
   contactsSlice.reducer
